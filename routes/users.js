@@ -1,9 +1,16 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+/* 
+ * GET userlist
+ */
+router.get('/userlist', function(req, res, next) {
+  var db = req.db; 
+  var collection = db.get('usercollection');
+
+  collection.find({}, {}, function(err, docs){
+    res.json(docs);
+  });
 });
 
 module.exports = router;
