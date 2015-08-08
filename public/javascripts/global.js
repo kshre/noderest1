@@ -9,6 +9,9 @@ $(document).ready(function() {
 	
 	// Username link click
 	$('#userList table tbody').on('click', 'td a.linkshowuser', showUserInfo);
+
+	// Add User button click
+	$('#btnAddUser').on('click', addUser);
 });
 
 // Function ========================================
@@ -60,4 +63,51 @@ function showUserInfo(event) {
 
 };	
 
+function addUser(event) {
+	event.preventDefault();
 
+	// Basic validation - increase errorCount variable if any of the fields are blank
+	var errCount = 0;
+	$('#addUser input').each(function(index, val) {
+		if($(this).val() === '') {errCount++;}
+	});
+
+	// Check and make sure that errCount is still at zero
+	if(errCount === 0) {
+		var newUser = {
+			'username': $('#addUser fieldset input#inputUserName').val(),
+			'email': $('#addUser fieldset input#inputUserEmail').val(),
+			'fullname': $('#addUser fieldset input#inputUserFullname').val(),
+			'location': $('#addUser fieldset input#inputUserLocation').val(),
+			'age': $('#addUser fieldset input#inputUserAge').val(),
+			'gender': $('#addUser fieldset input#inputUserGender').val()
+		};
+
+		// Use AJAX to post the object to our adduser service
+		$.ajax({
+			type: 'POST',
+			data: newUser,
+			url: '/users/adduser',
+			dataType: 'JSON'
+		}).done(function( response ) {
+	
+			// Check for sucessful (blank) response
+			if (response.msg === '') {
+				// Clear the form inputs
+				$('#addUser fieldset input').val('');
+	
+				// Update the table
+				populateTable();
+			} else {
+				// If something goes wrong, alert the error message that our service returned
+				alert('Error:' + response.msg);
+	
+			}
+		});
+	}
+	else {
+		// If errorCount is more than 0, error out
+		alert('Please fill in all fields');
+		return false;
+	}
+};
